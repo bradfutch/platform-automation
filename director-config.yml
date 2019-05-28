@@ -1,0 +1,145 @@
+az-configuration:
+- name: ((az0))
+- name: ((az1))
+properties-configuration:  
+  iaas_configuration:
+    additional_cloud_properties: {}
+    access_key_id: ((access_key_id))
+    secret_access_key: ((secret_access_key))
+    encrypted: true
+    iam_instance_profile: {}
+    key_pair_name: ((keypair-name))
+    name: aws
+    region: ((region))
+    security_group: ((security-group))
+    ssh_private_key: ((ssh_key))
+  director_configuration:
+    blobstore_type: local
+    bosh_recreate_on_next_deploy: false
+    bosh_recreate_persistent_disks_on_next_deploy: false
+    database_type: internal
+    director_worker_count: 5
+    encryption:
+      keys: []
+      providers: []
+    hm_emailer_options:
+      enabled: false
+    hm_pager_duty_options:
+      enabled: false
+    identification_tags: {}
+    job_configuration_on_tmpfs: false
+    keep_unreachable_vms: false
+    local_blobstore_options:
+      tls_enabled: true
+    ntp_servers_string: 169.254.169.123
+    post_deploy_enabled: false
+    resurrector_enabled: true
+    retry_bosh_deploys: false
+    skip_director_drain: false
+  security_configuration:
+    generate_vm_passwords: true
+    opsmanager_root_ca_trusted_certs: false
+  syslog_configuration:
+    enabled: false
+network-assignment:
+  network:
+    name: sandbox-infrastructure-subnet
+  other_availability_zones: []
+  singleton_availability_zone:
+    name: ((az0))
+networks-configuration:
+  icmp_checks_enabled: false
+  networks:
+  - name: sandbox-ert-subnet
+    subnets:
+    - iaas_identifier: ((ert-subnet-0))
+      cidr: 10.0.4.0/24
+      dns: 10.0.4.2
+      gateway: 10.0.4.1
+      reserved_ip_ranges: 10.0.4.0-10.0.4.4
+      availability_zone_names:
+      - ((az0))
+    - iaas_identifier: ((ert-subnet-1))
+      cidr: 10.0.5.0/24
+      dns: 10.0.5.2
+      gateway: 10.0.5.1
+      reserved_ip_ranges: 10.0.5.0-10.0.5.4
+      availability_zone_names:
+      - ((az1))
+  - name: sandbox-infrastructure-subnet
+    subnets:
+    - iaas_identifier: ((infra-subnet-0))
+      cidr: 10.0.16.0/28
+      dns: 10.0.16.2
+      gateway: 10.0.16.1
+      reserved_ip_ranges: 10.0.16.0-10.0.16.4
+      availability_zone_names:
+      - ((az0))
+    - iaas_identifier: ((infra-subnet-1))
+      cidr: 10.0.16.16/28
+      dns: 10.0.16.18
+      gateway: 10.0.16.17
+      reserved_ip_ranges: 10.0.16.16-10.0.16.20
+      availability_zone_names:
+      - ((az1))
+  - name: sandbox-public-subnet
+    subnets:
+    - iaas_identifier: ((public-subnet-0))
+      cidr: 10.0.0.0/24
+      dns: 10.0.0.2
+      gateway: 10.0.0.1
+      reserved_ip_ranges: 10.0.0.0-10.0.0.4
+      availability_zone_names:
+      - ((az0))
+    - iaas_identifier: ((public-subnet-1))
+      cidr: 10.0.1.0/24
+      dns: 10.0.1.2
+      gateway: 10.0.1.1
+      reserved_ip_ranges: 10.0.1.0-10.0.1.4
+      availability_zone_names:
+      - ((az1))
+  - name: sandbox-rds-subnet
+    subnets:
+    - iaas_identifier: ((services-subnet-0))
+      cidr: 10.0.12.0/24
+      dns: 10.0.12.2
+      gateway: 10.0.12.1
+      reserved_ip_ranges: 10.0.12.0-10.0.12.4
+      availability_zone_names:
+      - ((az0))
+    - iaas_identifier: ((rds-subnet-1))
+      cidr: 10.0.13.0/24
+      dns: 10.0.13.2
+      gateway: 10.0.13.1
+      reserved_ip_ranges: 10.0.13.0-10.0.13.4
+      availability_zone_names:
+      - ((az1))
+  - name: sandbox-services-subnet
+    subnets:
+    - iaas_identifier: ((services-subnet-0))
+      cidr: 10.0.8.0/24
+      dns: 10.0.8.2
+      gateway: 10.0.8.1
+      reserved_ip_ranges: 10.0.8.0-10.0.8.4
+      availability_zone_names:
+      - ((az0))
+    - iaas_identifier: ((services-subnet-1))
+      cidr: 10.0.9.0/24
+      dns: 10.0.9.2
+      gateway: 10.0.9.1
+      reserved_ip_ranges: 10.0.9.0-10.0.9.4
+      availability_zone_names:
+      - ((az1))
+resource-configuration:
+  compilation:
+    instances: automatic
+    instance_type:
+      id: automatic
+    internet_connected: false
+  director:
+    instances: automatic
+    persistent_disk:
+      size_mb: automatic
+    instance_type:
+      id: automatic
+    internet_connected: false
