@@ -27,6 +27,7 @@ rds_subnet_1=$(terraform output --state=$state_file -json | jq -r .rds_subnet_id
 keypair_name=$(terraform output --state=$state_file -json | jq -r .ops_manager_ssh_public_key_name.value | xargs -I_ echo "keypair-name: _")
 region=$(terraform output --state=$state_file -json | jq -r .region.value | xargs -I_ echo "region: _")
 sec_group=$(terraform output --state=$state_file -json | jq -r .vms_security_group_id.value | xargs -I_ echo "security-group: _")
+opsman_dns=$(terraform output --state=$state_file -json | jq -r .ops_manager_dns.value | xargs -I_ echo "opsman_dns: _")
 ssh_key=$(terraform output --state=$state_file -json | jq -r .ops_manager_ssh_private_key.value | xargs -I_ echo "_" | sed 's/^/  /')
 
 echo $az0 >> $filename
@@ -44,6 +45,9 @@ echo $rds_subnet_1 >> $filename
 echo $keypair_name >> $filename
 echo $region >> $filename
 echo $sec_group >> $filename
+echo $opsman_dns >> $filename
 echo "ssh_key :  |" >> $filename
 echo "$ssh_key" >> $filename
+
 echo >> $filename
+

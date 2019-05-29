@@ -1,0 +1,113 @@
+---
+resource_types:
+- name: terraform
+  type: docker-image
+  source:
+    repository: ljfranklin/terraform-resource
+    tag: latest
+
+groups:
+- name: deploy
+  jobs:
+  - terraform-plan
+  - terraform-apply
+- name: destroy
+  jobs:
+  - terraform-destroy
+
+resources:
+- name: terraform
+  type: terraform
+  source:
+    env_name: {{env_name}}
+    backend_type: s3
+    backend_config:
+      bucket: {{terraform_bucket}}
+      key: sandbox/terraform.tfstate
+      region: {{region}}
+      access_key: {{access_key}}
+      secret_key: {{secret_key}}
+    vars:
+      tag_name: concourse
+    env:
+      AWS_ACCESS_KEY_ID: {{access_key}}
+      AWS_SECRET_ACCESS_KEY: {{secret_key}}
+- name: terraform-repo
+  type: git
+  source:
+    uri: {{terraform_git}}
+    branch: master
+#- name: automation-repo
+#  type: git
+#  source:
+#    uri: {{automation_git}}
+#    branch: master
+
+jobs:
+- name: terraform-plan
+  plan:
+  - get: terraform-repo
+  - put: terraform
+    params:
+      env_name: {{env_name}}
+      terraform_source: terraform-repo/terraforming-pas
+      plan_only: true
+      vars:
+        env_name: {{env_name}}
+        hosted_zone: {{hosted_zone}}
+        access_key: {{access_key}}
+        secret_key: {{secret_key}}
+        region: {{region}}
+        availability_zones: {{availability_zones}}
+        ops_manager_ami: {{ops_manager_ami}}
+        rds_instance_count: {{rds_instance_count}}
+        dns_suffix: {{dns_suffix}}
+        vpc_cidr: {{vpc_cidr}}
+        use_route53: {{use_route53}}
+        use_ssh_routes: {{use_ssh_routes}}
+        use_tcp_routes: {{use_tcp_routes}}
+- name: terraform-apply
+  plan:
+  - get: terraform-repo
+  - get: terraform
+    trigger: false
+    passed: [terraform-plan]
+  - put: terraform
+    params:
+      env_name: {{env_name}}
+      plan_run: true
+      terraform_source: terraform-repo/terraforming-pas
+#  - name: configure-auth
+#    plan:
+#      - get: automation-repo
+#      - get: terraform
+#        trigger: true
+#        passed: [terraform-apply]
+#      - task: generate
+- name: terraform-destroy
+  plan:
+  - get: terraform-repo
+  - get: terraform
+    trigger: false
+    passed: [terraform-apply]
+  - put: terraform
+    params:
+      env_name: {{env_name}}
+      terraform_source: terraform-repo/terraforming-pas
+      action: destroy
+      vars:
+        env_name: {{env_name}}
+        hosted_zone: {{hosted_zone}}
+        access_key: {{access_key}}
+        secret_key: {{secret_key}}
+        region: {{region}}
+        availability_zones: {{availability_zones}}
+        ops_manager_ami: {{ops_manager_ami}}
+        rds_instance_count: {{rds_instance_count}}
+        dns_suffix: {{dns_suffix}}
+        vpc_cidr: {{vpc_cidr}}
+        use_route53: {{use_route53}}
+        use_ssh_routes: {{use_ssh_routes}}
+        use_tcp_routes: {{use_tcp_routes}}
+    get_params:
+      action: destroy
