@@ -1,6 +1,9 @@
 ---
 platform: linux
 
+inputs:
+- name: automation_repo
+
 params:
 
   # - Required
@@ -39,10 +42,10 @@ run:
     pwd
     ls -R .
 
-    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i.bak  's/target:.*$/target: _/g' "${env_file}"
+    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i.bak  's/target:.*$/target: _/g' automation_repo/"${env_file}"
 
-    echo "username: $opsman_admin_user" >> "${auth_file}"
-    echo "password: $opsman_admin_password" >> "${auth_file}"
-    echo "decryption-passphrase: $opsman_decryption_passphrase" >> "${auth_file}"
+    echo "username: $opsman_admin_user" >> automation_repo/"${auth_file}"
+    echo "password: $opsman_admin_password" >> automation_repo/"${auth_file}"
+    echo "decryption-passphrase: $opsman_decryption_passphrase" >> automation_repo/"${auth_file}"
 
-    om --env "${env_file}" configure-authentication --config "${auth_file}"
+    om --env automation_repo/"${env_file}" configure-authentication --config automation_repo/"${auth_file}"
