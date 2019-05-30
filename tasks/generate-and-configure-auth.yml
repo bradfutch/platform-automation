@@ -27,11 +27,11 @@ run:
     cat /var/version && echo ""
     set -eux
 
-    sudo apt-get install jq
-    sudo apt-get install unzip
+    apt-get install jq
+    apt-get install unzip
     wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
     unzip terraform_0.12.0_linux_amd64.zip
-    sudo mv terraform /usr/local/bin/
+    mv terraform /usr/local/bin/
     terraform --version
 
     terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i '' 's/target:.*$/target: _/g' "${env_file}"
