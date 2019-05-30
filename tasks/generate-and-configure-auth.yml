@@ -36,7 +36,10 @@ run:
     mv terraform /usr/local/bin/
     terraform --version
 
-    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i '' 's/target:.*$/target: _/g' "${env_file}"
+    pwd
+    ls -R .
+
+    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i.bak  's/target:.*$/target: _/g' "${env_file}"
 
     echo "username: $opsman_admin_user" >> "${auth_file}"
     echo "password: $opsman_admin_password" >> "${auth_file}"
