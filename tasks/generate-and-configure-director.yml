@@ -89,7 +89,7 @@ run:
 
     echo >> $filename
 
-    cat automation_rep/"${env_file}"
+    cat automation_repo/"${env_file}"
     cat $auth_file
     
     om --env automation_repo/"${env_file}" configure-director -c automation_repo/"${director_config_file}" --vars-file $filename --vars-file $auth_file
