@@ -1,6 +1,4 @@
 secrets.yml
 aws_pcf_user_creds.csv
-env.yml
-auth.yml
 director-config-vars.yml
 vars/

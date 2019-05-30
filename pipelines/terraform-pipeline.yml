@@ -11,6 +11,7 @@ groups:
   jobs:
   - terraform-plan
   - terraform-apply
+  - configure-auth
 - name: destroy
   jobs:
   - terraform-destroy
@@ -19,29 +20,45 @@ resources:
 - name: terraform
   type: terraform
   source:
-    env_name: {{env_name}}
+    env_name: ((env_name))
     backend_type: s3
     backend_config:
-      bucket: {{terraform_bucket}}
+      bucket: ((terraform_bucket))
       key: sandbox/terraform.tfstate
-      region: {{region}}
-      access_key: {{access_key}}
-      secret_key: {{secret_key}}
+      region: ((region))
+      access_key: ((access_key))
+      secret_key: ((secret_key))
     vars:
       tag_name: concourse
     env:
-      AWS_ACCESS_KEY_ID: {{access_key}}
-      AWS_SECRET_ACCESS_KEY: {{secret_key}}
+      AWS_ACCESS_KEY_ID: ((access_key))
+      AWS_SECRET_ACCESS_KEY: ((secret_key))
 - name: terraform-repo
   type: git
   source:
-    uri: {{terraform_git}}
+    uri: ((terraform_git))
     branch: master
-#- name: automation-repo
-#  type: git
-#  source:
-#    uri: {{automation_git}}
-#    branch: master
+- name: automation-repo
+  type: git
+  source:
+    uri: ((automation_git))
+    branch: master
+- name: platform-automation-tasks
+  type: s3
+  source:
+    access_key_id: ((access_key))
+    secret_access_key: ((secret_key))
+    region_name: ((region))
+    bucket: ((automation_bucket))
+    regexp: .*tasks-(.*).zip
+- name: platform-automation-image
+  type: s3
+  source:
+    access_key_id: ((access_key))
+    secret_access_key: ((secret_key))
+    region_name: ((region))
+    bucket: ((automation_bucket))
+    regexp: .*image-(.*).tgz
 
 jobs:
 - name: terraform-plan
@@ -49,23 +66,23 @@ jobs:
   - get: terraform-repo
   - put: terraform
     params:
-      env_name: {{env_name}}
+      env_name: ((env_name))
       terraform_source: terraform-repo/terraforming-pas
       plan_only: true
       vars:
-        env_name: {{env_name}}
-        hosted_zone: {{hosted_zone}}
-        access_key: {{access_key}}
-        secret_key: {{secret_key}}
-        region: {{region}}
-        availability_zones: {{availability_zones}}
-        ops_manager_ami: {{ops_manager_ami}}
-        rds_instance_count: {{rds_instance_count}}
-        dns_suffix: {{dns_suffix}}
-        vpc_cidr: {{vpc_cidr}}
-        use_route53: {{use_route53}}
-        use_ssh_routes: {{use_ssh_routes}}
-        use_tcp_routes: {{use_tcp_routes}}
+        env_name: ((env_name))
+        hosted_zone: ((hosted_zone))
+        access_key: ((access_key))
+        secret_key: ((secret_key))
+        region: ((region))
+        availability_zones: ((availability_zones))
+        ops_manager_ami: ((ops_manager_ami))
+        rds_instance_count: ((rds_instance_count))
+        dns_suffix: ((dns_suffix))
+        vpc_cidr: ((vpc_cidr))
+        use_route53: ((use_route53))
+        use_ssh_routes: ((use_ssh_routes))
+        use_tcp_routes: ((use_tcp_routes))
 - name: terraform-apply
   plan:
   - get: terraform-repo
@@ -74,16 +91,38 @@ jobs:
     passed: [terraform-plan]
   - put: terraform
     params:
-      env_name: {{env_name}}
+      env_name: ((env_name))
       plan_run: true
       terraform_source: terraform-repo/terraforming-pas
-#  - name: configure-auth
-#    plan:
-#      - get: automation-repo
-#      - get: terraform
-#        trigger: true
-#        passed: [terraform-apply]
-#      - task: generate
+- name: configure-auth
+  plan:
+  - get: automation-repo
+
+  - get: terraform
+    trigger: true
+    passed: [terraform-apply]
+
+  - get: platform-automation-image
+    params:
+      unpack: true
+
+  - get: platform-automation-tasks
+    params:
+      unpack: true
+
+  - task: generate-and-configure-auth
+    image: platform-automation-image
+    file: automation-repo/tasks/generate-and-configure-auth.yml
+    input_mapping:
+      automation_repo: automation-repo
+      state_dir: terraform
+    params:
+      env_file: configs/env.yml
+      auth_file: configs/auth.yml
+      state_file: metadata
+      opsman_admin_user: ((username))
+      opsman_admin_password: ((password))
+      opsman_decryption_passphrase: ((decryption-passphrase))
 - name: terraform-destroy
   plan:
   - get: terraform-repo
@@ -92,22 +131,22 @@ jobs:
     passed: [terraform-apply]
   - put: terraform
     params:
-      env_name: {{env_name}}
+      env_name: ((env_name))
       terraform_source: terraform-repo/terraforming-pas
       action: destroy
       vars:
-        env_name: {{env_name}}
-        hosted_zone: {{hosted_zone}}
-        access_key: {{access_key}}
-        secret_key: {{secret_key}}
-        region: {{region}}
-        availability_zones: {{availability_zones}}
-        ops_manager_ami: {{ops_manager_ami}}
-        rds_instance_count: {{rds_instance_count}}
-        dns_suffix: {{dns_suffix}}
-        vpc_cidr: {{vpc_cidr}}
-        use_route53: {{use_route53}}
-        use_ssh_routes: {{use_ssh_routes}}
-        use_tcp_routes: {{use_tcp_routes}}
+        env_name: ((env_name))
+        hosted_zone: ((hosted_zone))
+        access_key: ((access_key))
+        secret_key: ((secret_key))
+        region: ((region))
+        availability_zones: ((availability_zones))
+        ops_manager_ami: ((ops_manager_ami))
+        rds_instance_count: ((rds_instance_count))
+        dns_suffix: ((dns_suffix))
+        vpc_cidr: ((vpc_cidr))
+        use_route53: ((use_route53))
+        use_ssh_routes: ((use_ssh_routes))
+        use_tcp_routes: ((use_tcp_routes))
     get_params:
       action: destroy
