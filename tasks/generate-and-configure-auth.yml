@@ -1,20 +1,17 @@
 ---
 platform: linux
 
-inputs:
-- name: env         # directory that contains the env file with target OpsMan Information
-
 params:
 
   # - Required
   # - Filepath of the env config YAML
   # - The path is relative to root of the `env` input
-  env_file: env.yml
+  env_file:
 
   # - Required
   # - Filepath of the authorization config YAML
   # - The path is relative to root of the `env` input
-  auth_file: auth.yml
+  auth_file:
 
   opsman_admin_user:
 
@@ -30,10 +27,10 @@ run:
     cat /var/version && echo ""
     set -eux
 
-    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i '' 's/target:.*$/target: _/g' env/"${env_file}"
+    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i '' 's/target:.*$/target: _/g' "${env_file}"
 
-    echo "username: $opsman_admin_user" >> env/"${auth_file}"
-    echo "password: $opsman_admin_password" >> env/"${auth_file}"
-    echo "decryption-passphrase: $opsman_decryption_passphrase" >> env/"${auth_file}"
+    echo "username: $opsman_admin_user" >> "${auth_file}"
+    echo "password: $opsman_admin_password" >> "${auth_file}"
+    echo "decryption-passphrase: $opsman_decryption_passphrase" >> "${auth_file}"
 
-    om --env env/"${env_file}" configure-authentication --config env/"${auth_file}"
+    om --env "${env_file}" configure-authentication --config "${auth_file}"
