@@ -37,15 +37,17 @@ run:
     apt-get install -y jq
     apt-get install -y unzip
     apt-get install -y wget
-    wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
-    unzip terraform_0.12.0_linux_amd64.zip
-    mv terraform /usr/local/bin/
-    terraform --version
+
+    #wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
+    #unzip terraform_0.12.0_linux_amd64.zip
+    #mv terraform /usr/local/bin/
+    #terraform --version
 
     pwd
     ls -R .
 
-    terraform output -state=state_dir/"${state_file}"  -json | jq -r .ops_manager_dns.value | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
+    #terraform output -state=state_dir/"${state_file}"  -json | jq -r .ops_manager_dns.value | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
+    cat state_dir/"${state_file}" | jq -r .ops_manager_dns.value | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
 
     echo "username: $opsman_admin_user" >> automation_repo/"${auth_file}"
     echo "password: $opsman_admin_password" >> automation_repo/"${auth_file}"
