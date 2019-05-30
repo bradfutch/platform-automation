@@ -12,6 +12,7 @@ groups:
   - terraform-plan
   - terraform-apply
   - configure-auth
+  - configure-director
 - name: destroy
   jobs:
   - terraform-destroy
@@ -94,6 +95,7 @@ jobs:
       env_name: ((env_name))
       plan_run: true
       terraform_source: terraform-repo/terraforming-pas
+
 - name: configure-auth
   plan:
   - get: automation-repo
@@ -123,6 +125,37 @@ jobs:
       opsman_admin_user: ((username))
       opsman_admin_password: ((password))
       opsman_decryption_passphrase: ((decryption-passphrase))
+- name: configure-director
+  plan:
+  - get: automation-repo
+
+  - get: terraform
+    trigger: true
+    passed: [configure-auth]
+
+  - get: platform-automation-image
+    params:
+      unpack: true
+
+  - get: platform-automation-tasks
+    params:
+      unpack: true
+
+  - task: generate-and-configure-director
+    image: platform-automation-image
+    file: automation-repo/tasks/generate-and-configure-director.yml
+    input_mapping:
+      automation_repo: automation-repo
+      state_dir: terraform
+    params:
+      env_file: configs/env.yml
+      state_file: metadata
+      director_config_file: configs/director-config.yml
+      opsman_admin_user: ((username))
+      opsman_admin_password: ((password))
+      opsman_decryption_passphrase: ((decryption-passphrase))
+      access_key: ((access_key))
+      secret_key: ((secret_key))
 - name: terraform-destroy
   plan:
   - get: terraform-repo
