@@ -39,6 +39,8 @@ run:
     echo "decryption-passphrase: $opsman_decryption_passphrase" >> $auth_file
 
     cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
+    echo "username: $opsman_admin_user" >> automation_repo/"${env_file}"
+    echo "password: $opsman_admin_password" >> automation_repo/"${env_file}"
 
     echo "configuring opsman..."
 
