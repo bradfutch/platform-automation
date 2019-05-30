@@ -31,9 +31,10 @@ run:
     cat /var/version && echo ""
     set -eux
 
+    terraform output -state=sandbox/terraform.tfstate -json | jq -r .ops_manager_dns.value | xargs -I_ sed -i '' 's/target:.*$/target: _/g' env/"${env_file}"
+
     echo "username: $opsman_admin_user" >> env/"${auth_file}"
     echo "password: $opsman_admin_password" >> env/"${auth_file}"
     echo "decryption-passphrase: $opsman_decryption_passphrase" >> env/"${auth_file}"
 
-    om --env env/"${env_file}" configure-authentication \
-       --config env/"${auth_file}"
+    om --env env/"${env_file}" configure-authentication --config env/"${auth_file}"
