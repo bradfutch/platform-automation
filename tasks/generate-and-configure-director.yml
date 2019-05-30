@@ -16,6 +16,12 @@ params:
 
   director_config_file:
 
+  opsman_admin_user:
+
+  opsman_admin_password:
+
+  opsman_decryption_passphrase:
+
 run:
   path: bash
   args:
@@ -26,6 +32,11 @@ run:
 
     apt-get update
     apt-get install -y jq
+
+    auth_file=auth.yml
+    echo "username: $opsman_admin_user" >> $auth_file
+    echo "password: $opsman_admin_password" >> $auth_file
+    echo "decryption-passphrase: $opsman_decryption_passphrase" >> $auth_file
 
     cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
 
@@ -78,5 +89,5 @@ run:
 
     echo >> $filename
     
-    om --env automation_repo/"${env_file}" configure-director -c automation_repo/"${director_config_file}" --vars-file $filename
+    om --env automation_repo/"${env_file}" configure-director -c automation_repo/"${director_config_file}" --vars-file $filename --vars-file $auth_file
 
