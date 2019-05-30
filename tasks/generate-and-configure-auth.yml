@@ -45,6 +45,7 @@ run:
 
     pwd
     ls -R .
+    cat state_dir/"${state_file}"
 
     #terraform output -state=state_dir/"${state_file}"  -json | jq -r .ops_manager_dns.value | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
     cat state_dir/"${state_file}" | jq -r .ops_manager_dns.value | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
