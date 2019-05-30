@@ -1,0 +1,82 @@
+---
+platform: linux
+
+inputs:
+- name: automation_repo
+- name: state_dir
+
+params:
+
+  # - Required
+  # - Filepath of the env config YAML
+  # - The path is relative to root of the `env` input
+  env_file:
+
+  state_file:
+
+  director_config_file:
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    cat /var/version && echo ""
+    set -eux
+
+    apt-get update
+    apt-get install -y jq
+
+    cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
+
+    echo "configuring opsman..."
+
+    filename=director-config-vars.yml
+
+		az0=$(cat state_dir/"${state_file}" | jq -r .infrastructure_subnet_availability_zones[0] | xargs -I_ echo "az0: _")
+		az1=$(cat state_dir/"${state_file}" | jq -r .infrastructure_subnet_availability_zones[1] | xargs -I_ echo "az1: _")
+
+		ert_subnet_0=$(cat state_dir/"${state_file}" | jq -r .pas_subnet_ids[0] | xargs -I_ echo "ert-subnet-0: _")
+		ert_subnet_1=$(cat state_dir/"${state_file}" | jq -r .pas_subnet_ids[1] | xargs -I_ echo "ert-subnet-1: _")
+
+		infra_subnet_0=$(cat state_dir/"${state_file}" | jq -r .infrastructure_subnet_ids[0] | xargs -I_ echo "infra-subnet-0: _")
+		infra_subnet_1=$(cat state_dir/"${state_file}" | jq -r .infrastructure_subnet_ids[1] | xargs -I_ echo "infra-subnet-1: _")
+
+		public_subnet_0=$(cat state_dir/"${state_file}" | jq -r .public_subnet_ids[0] | xargs -I_ echo "public-subnet-0: _")
+		public_subnet_1=$(cat state_dir/"${state_file}" | jq -r .public_subnet_ids[1] | xargs -I_ echo "public-subnet-1: _")
+
+		services_subnet_0=$(cat state_dir/"${state_file}" | jq -r .services_subnet_ids[0] | xargs -I_ echo "services-subnet-0: _")
+		services_subnet_1=$(cat state_dir/"${state_file}" | jq -r .services_subnet_ids[1] | xargs -I_ echo "services-subnet-1: _")
+
+		rds_subnet_0=$(cat state_dir/"${state_file}" | jq -r .rds_subnet_ids[0] | xargs -I_ echo "rds-subnet-0: _")
+		rds_subnet_1=$(cat state_dir/"${state_file}" | jq -r .rds_subnet_ids[1] | xargs -I_ echo "rds-subnet-1: _")
+
+		keypair_name=$(cat state_dir/"${state_file}" | jq -r .ops_manager_ssh_public_key_name | xargs -I_ echo "keypair-name: _")
+		region=$(cat state_dir/"${state_file}" | jq -r .region | xargs -I_ echo "region: _")
+		sec_group=$(cat state_dir/"${state_file}" | jq -r .vms_security_group_id | xargs -I_ echo "security-group: _")
+		opsman_dns=$(cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I_ echo "opsman_dns: _")
+		ssh_key=$(cat state_dir/"${state_file}" | jq -r .ops_manager_ssh_private_key | xargs -I_ echo "_" | sed 's/^/  /')
+
+	  echo $az0 >> $filename
+		echo $az1 >> $filename
+		echo $ert_subnet_0 >> $filename
+		echo $ert_subnet_1 >> $filename
+		echo $infra_subnet_0 >> $filename
+		echo $infra_subnet_1 >> $filename
+		echo $public_subnet_0 >> $filename
+		echo $public_subnet_1 >> $filename
+		echo $services_subnet_0 >> $filename
+		echo $services_subnet_1 >> $filename
+		echo $rds_subnet_0 >> $filename
+		echo $rds_subnet_1 >> $filename
+		echo $keypair_name >> $filename
+		echo $region >> $filename
+		echo $sec_group >> $filename
+		echo $opsman_dns >> $filename
+		echo "ssh_key :  |" >> $filename
+		echo "$ssh_key" >> $filename
+
+		echo >> $filename	
+    
+    om --env automation_repo/"${env_file}" configure-director -c automation_repo/"${director_config_file}" --vars-file $filename
+
