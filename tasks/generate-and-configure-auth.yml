@@ -29,6 +29,7 @@ run:
 
     apt-get install -y jq
     apt-get install -y unzip
+    apt-get install -y wget
     wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
     unzip terraform_0.12.0_linux_amd64.zip
     mv terraform /usr/local/bin/
