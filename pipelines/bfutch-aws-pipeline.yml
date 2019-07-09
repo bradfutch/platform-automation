@@ -190,6 +190,7 @@ jobs:
       pivnet_api_token: ((pivnet-api-token))
       pivnet_file_glob: ((pivnet-file-glob))
       pivnet_product_slug: ((pivnet-product-slug))
+      product_version_regex: ((product-version-regex))
       stemcell_iaas: ((stemcell-iaas))
 
 

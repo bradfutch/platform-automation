@@ -55,11 +55,11 @@ run:
     om download-product \
        --config automation_repo/"${config_file}" \
        --output-directory "${output_directory}" \
-       --pivnet_api_token "${pivnet_api_token}" \
-       --pivnet_file_glob "${pivnet_file_glob}" \
-       --pivnet_product_slug "${pivnet_product_slug}" \
-       --product_version_regex "${product_version_regex}" \
-       --stemcell_iaas "${stemcell_iaas}"
+       --pivnet-api-token "${pivnet_api_token}" \
+       --pivnet-file-glob "${pivnet_file_glob}" \
+       --pivnet-product-slug "${pivnet_product_slug}" \
+       --product-version-regex "${product_version_regex}" \
+       --stemcell-iaas "${stemcell_iaas}"
 
     product_file=$(om interpolate \
       --config downloaded-files/download-file.json \
