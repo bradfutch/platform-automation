@@ -187,6 +187,11 @@ jobs:
     params:
       config_file: configs/download-pas.yml
       env_file: configs/env.yml
+      pivnet-api-token: ((pivnet-api-token))
+      pivnet-file-glob: ((pivnet-file-glob))
+      pivnet-product-slug: ((pivnet-product-slug))
+      stemcell-iaas: ((stemcell-iaas))
+
 
 - name: terraform-destroy
   plan:
