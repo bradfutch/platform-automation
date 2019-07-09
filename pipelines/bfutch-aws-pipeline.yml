@@ -187,10 +187,10 @@ jobs:
     params:
       config_file: configs/download-pas.yml
       env_file: configs/env.yml
-      pivnet-api-token: ((pivnet-api-token))
-      pivnet-file-glob: ((pivnet-file-glob))
-      pivnet-product-slug: ((pivnet-product-slug))
-      stemcell-iaas: ((stemcell-iaas))
+      pivnet_api_token: ((pivnet-api-token))
+      pivnet_file_glob: ((pivnet-file-glob))
+      pivnet_product_slug: ((pivnet-product-slug))
+      stemcell_iaas: ((stemcell-iaas))
 
 
 - name: terraform-destroy
