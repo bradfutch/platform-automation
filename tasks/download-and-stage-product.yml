@@ -45,12 +45,15 @@ run:
     cat /var/version && echo ""
     set -eux
 
+    apt-get update
+    apt-get install -y jq
+
     cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
 
     # ${vars_files_args[@] needs to be globbed to pass through properly
     # shellcheck disable=SC2068
     om download-product \
-       --config automation_repo/configs/"${config_file}" \
+       --config automation_repo/"${config_file}" \
        --output-directory ${output_directory} \
        --pivnet-api-token ${pivnet-api-token} \
        --pivnet-file-glob ${pivnet-file-glob} \
