@@ -36,6 +36,8 @@ params:
   state_file: metadata
   env_file: 
   output_directory: downloaded-files
+  om_username:
+  om_password:
 
 run:
   path: bash
@@ -49,6 +51,11 @@ run:
     apt-get install -y jq
 
     cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
+    echo "username: ${om_username}" >> automation_repo/"${env_file}"
+    echo "password: ${om_password}" >> automation_repo/"${env_file}"
+
+    # debug
+    cat automation_repo/"${env_file}"
 
     # ${vars_files_args[@] needs to be globbed to pass through properly
     # shellcheck disable=SC2068
@@ -80,13 +87,8 @@ run:
 
     # UPLOAD AND STAGE
 
-    if [ -z "automation_repo/${config_file}" ]; then
-        om --env automation_repo/"${env_file}" upload-product \
-           --product ${product_file}
-    else
-      om --env automation_repo/"${env_file}" upload-product \
-         --product ${product_file}
-    fi
+    om --env automation_repo/"${env_file}" upload-product \
+    --product ${product_file}
 
     product_name="$(om tile-metadata \
       --product-path "${product_file}"  \

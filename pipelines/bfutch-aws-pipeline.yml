@@ -192,6 +192,8 @@ jobs:
       pivnet_product_slug: ((pivnet-product-slug))
       product_version_regex: ((product-version-regex))
       stemcell_iaas: ((stemcell-iaas))
+      om_username: ((username))
+      om_password: ((password))
 
 
 - name: terraform-destroy
