@@ -80,12 +80,12 @@ run:
 
     # UPLOAD AND STAGE
 
-    if [ -z "automation_repo/configs/${config_file}" ]; then
+    if [ -z "automation_repo/${config_file}" ]; then
         om --env automation_repo/"${env_file}" upload-product \
            --product ${product_file}
     else
       om --env automation_repo/"${env_file}" upload-product \
-         --product ${product_file} --config "automation_repo/configs/${config_file}"
+         --product ${product_file} --config "automation_repo/${config_file}"
     fi
 
     product_name="$(om tile-metadata \
