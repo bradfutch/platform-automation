@@ -53,7 +53,6 @@ run:
     # ${vars_files_args[@] needs to be globbed to pass through properly
     # shellcheck disable=SC2068
     om download-product \
-       --config automation_repo/"${config_file}" \
        --output-directory "${output_directory}" \
        --pivnet-api-token "${pivnet_api_token}" \
        --pivnet-file-glob "${pivnet_file_glob}" \
