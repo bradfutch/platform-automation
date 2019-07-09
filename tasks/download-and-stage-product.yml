@@ -54,12 +54,12 @@ run:
     # shellcheck disable=SC2068
     om download-product \
        --config automation_repo/"${config_file}" \
-       --output-directory ${output_directory} \
-       --pivnet-api-token ${pivnet-api-token} \
-       --pivnet-file-glob ${pivnet-file-glob} \
-       --pivnet-product-slug ${pivnet-product-slug} \
-       --product-version-regex ${product-version-regex} \
-       --stemcell-iaas ${stemcell-iaas}
+       --output-directory "${output_directory}" \
+       --pivnet-api-token "${pivnet-api-token}" \
+       --pivnet-file-glob "${pivnet-file-glob}" \
+       --pivnet-product-slug "${pivnet-product-slug}" \
+       --product-version-regex "${product-version-regex}" \
+       --stemcell-iaas "${stemcell-iaas}"
 
     product_file=$(om interpolate \
       --config downloaded-files/download-file.json \
@@ -81,24 +81,24 @@ run:
 
     # UPLOAD AND STAGE
 
-    if [ -z "automation_repo/configs/$config_file" ]; then
+    if [ -z "automation_repo/configs/${config_file}" ]; then
         om --env automation_repo/"${env_file}" upload-product \
            --product ${product_file}
     else
       om --env automation_repo/"${env_file}" upload-product \
-         --product ${product_file} --config "automation_repo/configs/$config_file"
+         --product ${product_file} --config "automation_repo/configs/${config_file}"
     fi
 
     product_name="$(om tile-metadata \
-      --product-path ${product_file}  \
+      --product-path "${product_file}"  \
       --product-name)"
     product_version="$(om tile-metadata \
-      --product-path ${product_file}  \
+      --product-path "${product_file}"  \
       --product-version)"
 
     om --env automation_repo/"${env_file}" stage-product \
-       --product-name "$product_name" \
-       --product-version "$product_version"
+       --product-name "${product_name}" \
+       --product-version "${product_version}"
 
     # code_snippet assign-stemcell-support end
 # code_snippet download-product end
