@@ -2,3 +2,4 @@ secrets.yml
 aws_pcf_user_creds.csv
 director-config-vars.yml
 vars/
+downloaded-products

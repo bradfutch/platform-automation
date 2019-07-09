@@ -4,7 +4,7 @@ resource_types:
   type: docker-image
   source:
     repository: ljfranklin/terraform-resource
-    tag: latest
+    tag: 0.11.14
 
 groups:
 - name: deploy
@@ -13,6 +13,7 @@ groups:
   - terraform-apply
   - configure-auth
   - configure-director
+  - fetch-upload-stage-pas
 - name: destroy
   jobs:
   - terraform-destroy
@@ -34,16 +35,19 @@ resources:
     env:
       AWS_ACCESS_KEY_ID: ((access_key))
       AWS_SECRET_ACCESS_KEY: ((secret_key))
+
 - name: terraform-repo
   type: git
   source:
     uri: ((terraform_git))
     branch: master
+
 - name: automation-repo
   type: git
   source:
     uri: ((automation_git))
     branch: master
+
 - name: platform-automation-tasks
   type: s3
   source:
@@ -52,6 +56,7 @@ resources:
     region_name: ((region))
     bucket: ((automation_bucket))
     regexp: .*tasks-(.*).zip
+
 - name: platform-automation-image
   type: s3
   source:
@@ -84,6 +89,7 @@ jobs:
         use_route53: ((use_route53))
         use_ssh_routes: ((use_ssh_routes))
         use_tcp_routes: ((use_tcp_routes))
+
 - name: terraform-apply
   plan:
   - get: terraform-repo
@@ -156,6 +162,31 @@ jobs:
       opsman_decryption_passphrase: ((decryption-passphrase))
       access_key: ((access_key))
       secret_key: ((secret_key))
+- name: fetch-upload-stage-pas
+  plan:
+  - get: automation-repo
+
+  - get: terraform
+    trigger: true
+    passed: [configure-director]
+
+  - get: platform-automation-image
+    params:
+      unpack: true
+
+  - get: platform-automation-tasks
+    params:
+      unpack: true
+
+  - task: fetch-upload-stage-pas
+    image: platform-automation-image
+    file: automation-repo/tasks/download-and-stage-product.yml
+    input_mapping:
+      state_dir: terraform
+      automation_repo: automation-repo
+    params:
+      config_file: configs/env.yml
+
 - name: terraform-destroy
   plan:
   - get: terraform-repo

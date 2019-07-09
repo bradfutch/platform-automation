@@ -1,0 +1,6 @@
+output-directory: ((pivnet-output-directory))
+pivnet-api-token: ((pivnet-api-token))
+pivnet-file-glob: ((pivnet-file-glob)) 
+pivnet-product-slug: ((pivnet-product-slug))
+product-version-regex: ((product-version-regex))
+stemcell-iaas: ((stemcell-iaas))

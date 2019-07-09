@@ -1,0 +1,103 @@
+# The inputs, outputs, params, filename, and filepath
+# of this task file are part of its semantically versioned API.
+# See our documentation for a detailed discussion of our semver API.
+# See www.semver.org for an explanation of semantic versioning.
+
+# code_snippet download-and-stage start yaml
+---
+platform: linux
+
+inputs:
+- name: config # contains download-file config file
+- name: vars # variable files to be made available
+- name: state_dir
+- name: automation_repo
+  optional: true
+- name: secrets
+  # secret files to be made available
+  # separate from vars, so they can be store securely
+  optional: true
+
+outputs:
+- name: downloaded-product
+- name: downloaded-stemcell
+- name: assign-stemcell-config
+
+caches:
+- path: downloaded-files
+
+params:
+  config_file: download-config.yml
+  # - Filepath to the product configuration yaml file
+  # - The path is relative to the root of the `config` input
+  output-directory:
+  pivnet-api-token:
+  pivnet-file-glob:
+  pivnet-product-slug:
+  product-version-regex:
+  stemcell-iaas:
+  state_file: metadata
+  env_file: 
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    cat /var/version && echo ""
+    set -eux
+
+    cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${env_file}"
+
+    # ${vars_files_args[@] needs to be globbed to pass through properly
+    # shellcheck disable=SC2068
+    om download-product \
+       --config config/"${config_file}" \
+       --output-directory ${output_directory} \
+       --pivnet-api-token ${pivnet-api-token} \
+       --pivnet-file-glob ${pivnet-file-glob} \
+       --pivnet-product-slug ${pivnet-product-slug} \
+       --product-version-regex ${product-version-regex} \
+       --stemcell-iaas ${stemcell-iaas}
+
+    product_file=$(om interpolate \
+      --config downloaded-files/download-file.json \
+      --path /product_path)
+
+    stemcell_file=$(om interpolate \
+      --config downloaded-files/download-file.json \
+      --path /stemcell_path?)
+
+    cp "$product_file" downloaded-product
+
+    if [ -e "$stemcell_file" ]; then
+      cp "$stemcell_file" downloaded-stemcell
+    fi
+
+    if [ -e downloaded-files/assign-stemcell.yml ]; then
+      cp downloaded-files/assign-stemcell.yml assign-stemcell-config/config.yml
+    fi
+
+    # UPLOAD AND STAGE
+
+    if [ -z "$config_file" ]; then
+        om --env automation_repo/"${env_file}" upload-product \
+           --product ${product_file}
+    else
+      om --env automation_repo/"${env_file}" upload-product \
+         --product ${product_file} --config "config/$config_file"
+    fi
+
+    product_name="$(om tile-metadata \
+      --product-path ${product_file}  \
+      --product-name)"
+    product_version="$(om tile-metadata \
+      --product-path ${product_file}  \
+      --product-version)"
+
+    om --env automation_repo/"${env_file}" stage-product \
+       --product-name "$product_name" \
+       --product-version "$product_version"
+
+    # code_snippet assign-stemcell-support end
+# code_snippet download-product end
