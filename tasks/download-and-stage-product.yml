@@ -28,11 +28,11 @@ params:
   config_file: download-config.yml
   # - Filepath to the product configuration yaml file
   # - The path is relative to the root of the `config` input
-  pivnet-api-token:
-  pivnet-file-glob:
-  pivnet-product-slug:
-  product-version-regex:
-  stemcell-iaas:
+  pivnet_api_token:
+  pivnet_file_glob:
+  pivnet_product_slug:
+  product_version_regex:
+  stemcell_iaas:
   state_file: metadata
   env_file: 
   output_directory: downloaded-files
@@ -55,11 +55,11 @@ run:
     om download-product \
        --config automation_repo/"${config_file}" \
        --output-directory "${output_directory}" \
-       --pivnet-api-token "${pivnet-api-token}" \
-       --pivnet-file-glob "${pivnet-file-glob}" \
-       --pivnet-product-slug "${pivnet-product-slug}" \
-       --product-version-regex "${product-version-regex}" \
-       --stemcell-iaas "${stemcell-iaas}"
+       --pivnet_api_token "${pivnet_api_token}" \
+       --pivnet_file_glob "${pivnet_file_glob}" \
+       --pivnet_product_slug "${pivnet_product_slug}" \
+       --product_version_regex "${product_version_regex}" \
+       --stemcell_iaas "${stemcell_iaas}"
 
     product_file=$(om interpolate \
       --config downloaded-files/download-file.json \
