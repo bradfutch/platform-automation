@@ -28,7 +28,6 @@ params:
   config_file: download-config.yml
   # - Filepath to the product configuration yaml file
   # - The path is relative to the root of the `config` input
-  output-directory: downloaded-files
   pivnet-api-token:
   pivnet-file-glob:
   pivnet-product-slug:
@@ -36,6 +35,7 @@ params:
   stemcell-iaas:
   state_file: metadata
   env_file: 
+  output_directory: downloaded-files
 
 run:
   path: bash
