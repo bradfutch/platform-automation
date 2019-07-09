@@ -185,7 +185,8 @@ jobs:
       state_dir: terraform
       automation_repo: automation-repo
     params:
-      config_file: configs/env.yml
+      config_file: configs/download-pas.yml
+      env_file: configs/env.yml
 
 - name: terraform-destroy
   plan:
