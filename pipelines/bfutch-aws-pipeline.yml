@@ -26,7 +26,7 @@ resources:
     backend_type: s3
     backend_config:
       bucket: ((terraform_bucket))
-      key: sandbox/terraform.tfstate
+      key: ((env_name))/terraform.tfstate
       region: ((region))
       access_key: ((access_key))
       secret_key: ((secret_key))
