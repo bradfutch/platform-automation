@@ -102,7 +102,7 @@ run:
        --product-version "${product_version}"
 
     om --env automation_repo/"${env_file}" upload-stemcell \
-       --stemcell "${stecell_file}"
+       --stemcell "${stemcell_file}"
 
     om --env automation_repo/"${env_file}" assign-stemcell \
       --config assign-stemcell-config/config.yml \
