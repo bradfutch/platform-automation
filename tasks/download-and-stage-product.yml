@@ -101,6 +101,9 @@ run:
        --product-name "${product_name}" \
        --product-version "${product_version}"
 
+    om --env automation_repo/"${env_file}" upload-stemcell \
+       --stemcell "${stecell_file}"
+
     om --env automation_repo/"${env_file}" assign-stemcell \
       --config assign-stemcell-config/config.yml \
       --product "${product_name}"
