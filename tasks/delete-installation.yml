@@ -32,5 +32,5 @@ run:
     echo "username: ${om_username}" >> automation_repo/"${ENV_FILE}"
     echo "password: ${om_password}" >> automation_repo/"${ENV_FILE}"
 
-    om --env automation_repo/"${ENV_FILE}" delete-installation
+    om --env automation_repo/"${ENV_FILE}" delete-installation --force
 # code_snippet delete-installation end
