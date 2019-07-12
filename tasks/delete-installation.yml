@@ -12,6 +12,7 @@ inputs:
   optional: true
 - name: automation_repo
   optional: true
+  state_dir:
 
 params:
   ENV_FILE: env.yml
@@ -19,6 +20,7 @@ params:
   # - The path is relative to root of the `env` input
   om_username:
   om_password:
+  state_file: metadata
 
 run:
   path: bash
