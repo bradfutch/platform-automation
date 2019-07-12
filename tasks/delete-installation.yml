@@ -12,7 +12,7 @@ inputs:
   optional: true
 - name: automation_repo
   optional: true
-  state_dir:
+- name: state_dir
 
 params:
   ENV_FILE: env.yml
