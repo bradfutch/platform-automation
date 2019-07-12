@@ -9,11 +9,15 @@ platform: linux
 
 inputs:
 - name: env # contains the env file with target OpsMan Information
+- name: automation_repo
+  optional: true
 
 params:
   ENV_FILE: env.yml
   # - Filepath of the env config YAML
   # - The path is relative to root of the `env` input
+  om_username:
+  om_password:
 
 run:
   path: bash
@@ -22,5 +26,10 @@ run:
   - |
     cat /var/version && echo ""
     set -eux
+
+    cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${ENV_FILE}"
+    echo "username: ${om_username}" >> automation_repo/"${ENV_FILE}"
+    echo "password: ${om_password}" >> automation_repo/"${ENV_FILE}"
+
     om --env env/"${ENV_FILE}" delete-installation
 # code_snippet delete-installation end

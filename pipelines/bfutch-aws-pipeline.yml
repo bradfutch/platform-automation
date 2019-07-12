@@ -16,6 +16,7 @@ groups:
   - fetch-upload-stage-pas
 - name: destroy
   jobs:
+  - delete-installation
   - terraform-destroy
 
 resources:
@@ -195,13 +196,40 @@ jobs:
       om_username: ((username))
       om_password: ((password))
 
+- name: delete-installation
+  plan:
+  - get: automation-repo
+
+  - get: terraform
+    trigger: false
+    passed: [terraform-apply]
+
+  - get: platform-automation-image
+    params:
+      unpack: true
+
+  - get: platform-automation-tasks
+    params:
+      unpack: true
+
+  - task: delete-installation
+    image: platform-automation-image
+    file: automation-repo/delete-installation.yml
+    input_mapping:
+      env: configs
+      automation_repo: automation-repo
+    params:
+      om_username: ((username))
+      om_password: ((password))
 
 - name: terraform-destroy
   plan:
   - get: terraform-repo
+
   - get: terraform
-    trigger: false
-    passed: [terraform-apply]
+    trigger: true
+    passed: [delete-installation]
+
   - put: terraform
     params:
       env_name: ((env_name))
