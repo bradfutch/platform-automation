@@ -28,6 +28,9 @@ run:
     cat /var/version && echo ""
     set -eux
 
+    apt-get update
+    apt-get install -y jq
+
     cat state_dir/"${state_file}" | jq -r .ops_manager_dns | xargs -I# sed -i.bak  's/target:.*$/target: #/g' automation_repo/"${ENV_FILE}"
     echo "username: ${om_username}" >> automation_repo/"${ENV_FILE}"
     echo "password: ${om_password}" >> automation_repo/"${ENV_FILE}"
