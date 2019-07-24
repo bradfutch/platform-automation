@@ -214,13 +214,14 @@ jobs:
 
   - task: delete-installation
     image: platform-automation-image
-    file: automation-repo/delete-installation.yml
+    file: automation-repo/tasks/delete-installation.yml
     input_mapping:
-      env: configs
       automation_repo: automation-repo
+      state_dir: terraform
     params:
       om_username: ((username))
       om_password: ((password))
+      ENV_FILE: configs/env.yml
 
 - name: terraform-destroy
   plan:
